@@ -1,5 +1,4 @@
 import * as admin from 'firebase-admin';
-const { FieldValue } = admin.firestore;
 
 import { FIRESTORE_USER_ROOT } from '../../config/config';
 import serviceAccount from '../../config/serviceAccountKey.json';
