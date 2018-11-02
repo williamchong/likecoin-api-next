@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "backpack dev",
-    "test": "yarn test"
+    "lint": "eslint .",
+    "test": "npm run lint"
   },
   "author": "William Chong",
   "license": "GPL-3.0-or-later",
