@@ -1,0 +1,28 @@
+{
+  "name": "likecoin-api-public",
+  "version": "1.0.0",
+  "description": "LikeCoin API services",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "backpack dev",
+    "test": "lerna exec yarn test",
+    "lint": "lerna exec yarn lint",
+    "build": "lerna exec yarn build"
+  },
+  "keywords": [
+    "LikeCoin"
+  ],
+  "workspaces": [
+    "services/*"
+  ],
+  "author": "William Chong",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "backpack-core": "^0.8.1",
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "lerna": "^3.4.3"
+  }
+}
