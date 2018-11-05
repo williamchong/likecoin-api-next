@@ -3,7 +3,7 @@ import { toDataUrl } from '@likecoin/ethereum-blockies';
 import xml from 'xml';
 
 import { ValidationError } from '../../../../util/ValidationError';
-import { userCollection as dbRef } from '../util/firebase';
+import { userCollection as dbRef } from '../../../../util/firebase';
 
 const subdomain = ['www.', 'rinkeby.', 'button.', 'button.rinkeby.', 'widget.'];
 const queryUrlRegexp = new RegExp('^(?:https?:\\/\\/)?([a-z0-9.]+)?like\\.co\\/([-_a-z0-9]+)(?:/([0-9]+)?)?');

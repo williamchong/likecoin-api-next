@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import api from './api/oembed';
@@ -13,7 +12,6 @@ app.set('port', port);
 
 if (process.env.NODE_ENV === 'production') app.disable('x-powered-by');
 
-app.use(bodyParser.json());
 app.use(cors());
 
 app.use(api);

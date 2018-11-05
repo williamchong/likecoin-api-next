@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "backpack dev",
+    "build": "backpack build",
     "lint": "eslint .",
     "test": "npm run lint"
   },

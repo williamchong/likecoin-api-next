@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 
-import { FIRESTORE_USER_ROOT } from '../../config/config';
-import serviceAccount from '../../config/serviceAccountKey.json';
+import { FIRESTORE_USER_ROOT } from '../config/config';
+import serviceAccount from '../config/serviceAccountKey.json';
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -10,6 +10,6 @@ admin.initializeApp({
 const db = admin.firestore();
 db.settings({ timestampsInSnapshots: true });
 
-export const userCollection = db.collection(FIRESTORE_USER_ROOT);
+export const userCollection = FIRESTORE_USER_ROOT ? db.collection(FIRESTORE_USER_ROOT) : null;
 
 export default db;
