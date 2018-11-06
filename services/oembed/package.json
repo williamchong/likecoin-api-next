@@ -17,10 +17,13 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@likecoin/ethereum-blockies": "^0.1.2",
-    "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.4",
     "firebase-admin": "^6.1.0",
+    "source-map-support": "^0.5.9",
     "xml": "^1.0.1"
+  },
+  "devDependencies": {
+    "backpack-core": "^0.8.2"
   }
 }

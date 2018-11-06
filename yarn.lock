@@ -1915,10 +1915,10 @@ babel-loader@^8.0.2, babel-loader@v8.0.4:
     mkdirp "^0.5.1"
     util.promisify "^1.0.0"
 
-babel-preset-backpack@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/babel-preset-backpack/-/babel-preset-backpack-0.8.1.tgz#888f971167fbb689fd4f3cbffdb9a79098235925"
-  integrity sha512-+Uc+BqmUXoa5HJEGwaKZCorHpxbJ9/A4WIUPqnGTjnGQKZFKHJH8pA2g4uTYjdwq03UpGCb14iSqczt1W9GLOQ==
+babel-preset-backpack@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/babel-preset-backpack/-/babel-preset-backpack-0.8.2.tgz#c27197249a78e28c9ce7513e15508bd54f593bcf"
+  integrity sha512-wJEOPz8eW7qnmanOEZsOM8fIl6AEnApdh4XO3flp1Gu4c8/M5i7Ay7Oz2W4tlKCHPtKbyvN9R0Jvs5ByMCrZCA==
   dependencies:
     "@babel/core" "^7.0.0"
     "@babel/plugin-proposal-class-properties" "^7.0.0"
@@ -1931,14 +1931,14 @@ babel-preset-backpack@^0.8.1:
     "@babel/runtime" "^7.0.0"
     babel-loader v8.0.4
 
-backpack-core@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/backpack-core/-/backpack-core-0.8.1.tgz#ead72b5557c90d023e45610f3ff5f5331e1f90ba"
-  integrity sha512-gnd4+ZprzCOJaQu3rnamw9VwbYYKj+jWKdc/D7XHCOFkmLn7CCVRqTw6hctdVUl6mKfwpp2WqKvGtw9uTMCa4g==
+backpack-core@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/backpack-core/-/backpack-core-0.8.2.tgz#d8ef661ecbee43a87bce1888603a54eee8490873"
+  integrity sha512-EKAiTtL0Ij97bQc+rvzAmSr9moYlbiZD1OBjujCIg/Hr1nasXtViJrw1EedOUjXNFudIa0acfnCAXde/8FcNKQ==
   dependencies:
     "@babel/core" "^7.1.2"
     babel-loader "^8.0.2"
-    babel-preset-backpack "^0.8.1"
+    babel-preset-backpack "^0.8.2"
     cross-spawn "^5.0.1"
     friendly-errors-webpack-plugin "^1.7.0"
     json-loader "^0.5.7"
@@ -7327,6 +7327,14 @@ source-map-support@^0.4.15:
   dependencies:
     source-map "^0.5.6"
 
+source-map-support@^0.5.9:
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.9.tgz#41bc953b2534267ea2d605bccfa7bfa3111ced5f"
+  integrity sha512-gR6Rw4MvUlYy83vP0vxoVNzM6t8MUXqNuRsuBmBHQDu1Fh6X015FrLdgoDKcNdkwGubozq0P4N0Q37UyFVr1EA==
+  dependencies:
+    buffer-from "^1.0.0"
+    source-map "^0.6.0"
+
 source-map-url@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/source-map-url/-/source-map-url-0.4.0.tgz#3e935d7ddd73631b97659956d55128e87b5084a3"
@@ -7337,7 +7345,7 @@ source-map@^0.5.0, source-map@^0.5.6:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
   integrity sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w=
 
-source-map@^0.6.1, source-map@~0.6.1:
+source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
