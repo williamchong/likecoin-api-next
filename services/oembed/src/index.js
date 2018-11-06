@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 import api from './api/oembed';
-import errorHandler from '../../../middleware/errorHandler';
+import errorHandler from '../shared/middleware/errorHandler';
 
 const app = express();
 const host = process.env.HOST || '127.0.0.1';

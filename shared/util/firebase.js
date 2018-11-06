@@ -10,6 +10,7 @@ admin.initializeApp({
 const db = admin.firestore();
 db.settings({ timestampsInSnapshots: true });
 
+const userRoot = FIRESTORE_USER_ROOT || process.env.FIRESTORE_USER_ROOT;
 export const userCollection = FIRESTORE_USER_ROOT ? db.collection(FIRESTORE_USER_ROOT) : null;
 
 export default db;
