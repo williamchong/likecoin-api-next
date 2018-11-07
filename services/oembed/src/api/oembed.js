@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { toDataUrl } from '@likecoin/ethereum-blockies';
 import xml from 'xml';
 
-import { ValidationError } from '../../shared/util/ValidationError';
+import { ValidationError } from '../../shared/ValidationError';
 import { userCollection as dbRef } from '../../shared/util/firebase';
 
 const subdomain = ['www.', 'rinkeby.', 'button.', 'button.rinkeby.', 'widget.'];
