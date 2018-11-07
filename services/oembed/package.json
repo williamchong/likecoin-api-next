@@ -1,0 +1,29 @@
+{
+  "name": "likecoin-api-oembed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "backpack dev",
+    "build": "backpack build",
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "author": "William Chong",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@likecoin/ethereum-blockies": "^0.1.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.4",
+    "firebase-admin": "^6.1.0",
+    "source-map-support": "^0.5.9",
+    "xml": "^1.0.1"
+  },
+  "devDependencies": {
+    "backpack-core": "^0.8.2"
+  }
+}
