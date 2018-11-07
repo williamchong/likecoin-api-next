@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import api from './api/oembed';
+import api from './api/users';
 import errorHandler from '../shared/middleware/errorHandler';
 
 const app = express();

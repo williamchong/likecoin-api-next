@@ -1,21 +1,20 @@
-import { IS_TESTNET } from '../../../constant';
 import {
-  AUTH_COOKIE_OPTION,
+  IS_TESTNET,
   W3C_EMAIL_REGEX,
-} from '../../constant/server';
-
-import { ValidationHelper as Validate, ValidationError } from '../../../util/ValidationHelper';
-import { getEmailBlacklist, getEmailNoDot } from '../poller';
-import { jwtSign } from '../jwt';
-import { personalEcRecover, web3 } from '../web3';
+} from '../../shared/constant';
+import { AUTH_COOKIE_OPTION } from '../constant';
+import { checkAddressValid } from '../../shared/ValidationHelper';
+import { ValidationError } from '../../shared/ValidationError';
+import { getEmailBlacklist, getEmailNoDot } from './poller';
+import { jwtSign } from './jwt';
+import { personalEcRecover, hexToUtf8 } from './web3';
+import {
+  userCollection as dbRef,
+  userAuthCollection as authDbRef,
+  FieldValue,
+} from '../../shared/util/firebase';
 
 const disposableDomains = require('disposable-email-domains');
-
-const {
-  userCollection: dbRef,
-  userAuthCollection: authDbRef,
-  FieldValue,
-} = require('../firebase');
 
 export const ONE_DATE_IN_MS = 86400000;
 
@@ -73,7 +72,7 @@ export function checkSignPayload(from, payload, sign, isLogin) {
     return payload;
   }
   // trims away sign message header before JSON
-  const message = web3.utils.hexToUtf8(payload);
+  const message = hexToUtf8(payload);
   const actualPayload = JSON.parse(message.substr(message.indexOf('{')));
   const {
     wallet,
@@ -81,7 +80,7 @@ export function checkSignPayload(from, payload, sign, isLogin) {
   } = actualPayload;
 
   // check address match
-  if (from !== wallet || !Validate.checkAddressValid(wallet)) {
+  if (from !== wallet || !checkAddressValid(wallet)) {
     throw new ValidationError('PAYLOAD_WALLET_NOT_MATCH');
   }
 

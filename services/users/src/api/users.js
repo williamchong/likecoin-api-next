@@ -4,9 +4,10 @@ import BigNumber from 'bignumber.js';
 import { sendVerificationEmail, sendVerificationWithCouponEmail } from '../util/ses';
 import {
   PUBSUB_TOPIC_MISC,
-  ONE_LIKE,
-} from '../../constant';
-import { fetchFacebookUser } from '../oauth/facebook';
+} from '../../shared/constant';
+
+// import { fetchFacebookUser } from '../oauth/facebook';
+
 import {
   handleEmailBlackList,
   checkReferrerExists,
@@ -16,14 +17,27 @@ import {
   setSessionCookie,
   setAuthCookies,
   clearAuthCookies,
-} from '../util/api/users';
-import { tryToLinkSocialPlatform } from '../util/api/social';
+} from '../util/users';
+// import { tryToLinkSocialPlatform } from '../util/api/social';
 
-import { ValidationHelper as Validate, ValidationError } from '../../util/ValidationHelper';
+import {
+  checkUserNameValid,
+  checkAddressValid,
+  filterUserData,
+  filterUserDataMin,
+} from '../../shared/ValidationHelper';
+import { ValidationError } from '../../shared/ValidationError';
 import { handleAvatarUploadAndGetURL } from '../util/fileupload';
 import { jwtAuth } from '../util/jwt';
-import publisher from '../util/gcloudPub';
-import { getFirebaseUserProviderUserInfo } from '../../util/FirebaseApp';
+import publisher from '../../shared/util/gcloudPub';
+import { getFirebaseUserProviderUserInfo } from '../../shared/FirebaseApp';
+
+import {
+  userCollection as dbRef,
+  userAuthCollection as authDbRef,
+  FieldValue,
+  admin,
+} from '../../shared/util/firebase';
 
 const Multer = require('multer');
 const uuidv4 = require('uuid/v4');
@@ -32,16 +46,10 @@ const {
   REGISTER_LIMIT_WINDOW,
   REGISTER_LIMIT_COUNT,
   NEW_USER_BONUS_COOLDOWN,
-} = require('../config/config.js'); // eslint-disable-line import/no-extraneous-dependencies
+} = require('../config/config.js'); // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 
-const {
-  userCollection: dbRef,
-  userAuthCollection: authDbRef,
-  FieldValue,
-  admin,
-} = require('../util/firebase');
-
-export const THIRTY_S_IN_MS = 30000;
+const ONE_LIKE = new BigNumber(10).pow(18);
+const THIRTY_S_IN_MS = 30000;
 
 const multer = Multer({
   storage: Multer.memoryStorage(),
@@ -118,23 +126,23 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
         break;
       }
 
-      case 'facebook': {
-        const { accessToken } = req.body;
-        const { userId, email } = await fetchFacebookUser(accessToken);
-        payload = req.body;
-        if (userId !== payload.platformUserId) {
-          throw new ValidationError('USER_ID_NOT_MTACH');
-        }
-        platformUserId = userId;
+      // case 'facebook': {
+      //   const { accessToken } = req.body;
+      //   const { userId, email } = await fetchFacebookUser(accessToken);
+      //   payload = req.body;
+      //   if (userId !== payload.platformUserId) {
+      //     throw new ValidationError('USER_ID_NOT_MTACH');
+      //   }
+      //   platformUserId = userId;
 
-        // Set verified to the email if it matches Facebook verified email
-        isEmailVerified = email === payload.email;
+      //   // Set verified to the email if it matches Facebook verified email
+      //   isEmailVerified = email === payload.email;
 
-        // Verify Firebase user ID
-        const { firebaseIdToken } = req.body;
-        ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
-        break;
-      }
+      //   // Verify Firebase user ID
+      //   const { firebaseIdToken } = req.body;
+      //   ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
+      //   break;
+      // }
 
       default:
         throw new ValidationError('INVALID_PLATFORM');
@@ -154,7 +162,7 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
 
     isEmailEnabled = getBool(isEmailEnabled);
 
-    if (!Validate.checkUserNameValid(user)) throw new ValidationError('Invalid user name');
+    if (!checkUserNameValid(user)) throw new ValidationError('Invalid user name');
 
     if (email) {
       try {
@@ -262,7 +270,7 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
       await authDbRef.doc(user).create(doc);
     }
 
-    const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
+    // const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
 
     await setAuthCookies(req, res, { user, wallet });
     res.sendStatus(200);
@@ -278,20 +286,20 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
       locale,
       registerTime: createObj.timestamp,
     });
-    if (socialPayload) {
-      publisher.publish(PUBSUB_TOPIC_MISC, req, {
-        logType: 'eventSocialLink',
-        platform,
-        user,
-        email: email || undefined,
-        displayName,
-        wallet,
-        referrer: referrer || undefined,
-        locale,
-        registerTime: createObj.timestamp,
-        ...socialPayload,
-      });
-    }
+    // if (socialPayload) {
+    //   publisher.publish(PUBSUB_TOPIC_MISC, req, {
+    //     logType: 'eventSocialLink',
+    //     platform,
+    //     user,
+    //     email: email || undefined,
+    //     displayName,
+    //     wallet,
+    //     referrer: referrer || undefined,
+    //     locale,
+    //     registerTime: createObj.timestamp,
+    //     ...socialPayload,
+    //   });
+    // }
   } catch (err) {
     next(err);
   }
@@ -459,28 +467,28 @@ router.post('/users/login', async (req, res, next) => {
         break;
       }
 
-      case 'facebook': {
-        try {
-          const { accessToken, platformUserId } = req.body;
-          const { userId } = await fetchFacebookUser(accessToken);
-          if (userId !== platformUserId) {
-            throw new ValidationError('USER_ID_NOT_MTACH');
-          }
-          const query = (
-            await authDbRef
-              .where(`${platform}.userId`, '==', platformUserId)
-              .limit(1)
-              .get()
-          );
-          if (query.docs.length > 0) {
-            user = query.docs[0].id;
-          }
-        } catch (err) {
-          console.log(err);
-          // do nothing
-        }
-        break;
-      }
+      // case 'facebook': {
+      //   try {
+      //     const { accessToken, platformUserId } = req.body;
+      //     const { userId } = await fetchFacebookUser(accessToken);
+      //     if (userId !== platformUserId) {
+      //       throw new ValidationError('USER_ID_NOT_MTACH');
+      //     }
+      //     const query = (
+      //       await authDbRef
+      //         .where(`${platform}.userId`, '==', platformUserId)
+      //         .limit(1)
+      //         .get()
+      //     );
+      //     if (query.docs.length > 0) {
+      //       user = query.docs[0].id;
+      //     }
+      //   } catch (err) {
+      //     console.log(err);
+      //     // do nothing
+      //   }
+      //   break;
+      // }
 
       default:
         throw new ValidationError('INVALID_PLATFORM');
@@ -539,31 +547,31 @@ router.post('/users/login/add', jwtAuth('write'), async (req, res, next) => {
         await dbRef.doc(user).update({ firebaseUserId });
       }
 
-      const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
+      // const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
 
-      if (socialPayload) {
-        const userDoc = await dbRef.doc(user).get();
-        const {
-          email,
-          displayName,
-          wallet,
-          referrer,
-          locale,
-          timestamp,
-        } = userDoc.data();
-        publisher.publish(PUBSUB_TOPIC_MISC, req, {
-          logType: 'eventSocialLink',
-          platform,
-          user,
-          email,
-          displayName,
-          wallet,
-          referrer,
-          locale,
-          registerTime: timestamp,
-          ...socialPayload,
-        });
-      }
+      // if (socialPayload) {
+      //   const userDoc = await dbRef.doc(user).get();
+      //   const {
+      //     email,
+      //     displayName,
+      //     wallet,
+      //     referrer,
+      //     locale,
+      //     timestamp,
+      //   } = userDoc.data();
+      //   publisher.publish(PUBSUB_TOPIC_MISC, req, {
+      //     logType: 'eventSocialLink',
+      //     platform,
+      //     user,
+      //     email,
+      //     displayName,
+      //     wallet,
+      //     referrer,
+      //     locale,
+      //     registerTime: timestamp,
+      //     ...socialPayload,
+      //   });
+      // }
 
       /* TODO: update firebase auth linked platform info in a subcollection? */
     }
@@ -584,7 +592,7 @@ router.get('/users/self', jwtAuth('read'), async (req, res, next) => {
         payload.avatar = toDataUrl(payload.wallet);
       }
       setSessionCookie(req, res, req.cookies.likecoin_auth);
-      res.json(Validate.filterUserData(payload));
+      res.json(filterUserData(payload));
       await dbRef.doc(req.user.user).collection('session').doc(req.user.jti).update({
         lastAccessedUserAgent: req.headers['user-agent'] || 'unknown',
         lastAccessedIP: req.headers['x-real-ip'] || req.ip,
@@ -632,7 +640,7 @@ router.get('/users/id/:id', jwtAuth('read'), async (req, res, next) => {
         payload.avatar = toDataUrl(payload.wallet);
       }
       payload.user = username;
-      res.json(Validate.filterUserData(payload));
+      res.json(filterUserData(payload));
     } else {
       res.sendStatus(404);
     }
@@ -651,7 +659,7 @@ router.get('/users/id/:id/min', async (req, res, next) => {
         payload.avatar = toDataUrl(payload.wallet);
       }
       payload.user = username;
-      res.json(Validate.filterUserDataMin(payload));
+      res.json(filterUserDataMin(payload));
     } else {
       res.sendStatus(404);
     }
@@ -670,7 +678,7 @@ router.get('/users/merchant/:id/min', async (req, res, next) => {
         payload.avatar = toDataUrl(payload.wallet);
       }
       payload.user = query.docs[0].id;
-      res.json(Validate.filterUserDataMin(payload));
+      res.json(filterUserDataMin(payload));
     } else {
       res.sendStatus(404);
     }
@@ -682,7 +690,7 @@ router.get('/users/merchant/:id/min', async (req, res, next) => {
 router.get('/users/addr/:addr', jwtAuth('read'), async (req, res, next) => {
   try {
     const { addr } = req.params;
-    if (!Validate.checkAddressValid(addr)) throw new ValidationError('Invalid address');
+    if (!checkAddressValid(addr)) throw new ValidationError('Invalid address');
     if (req.user.wallet !== addr) {
       res.status(401).send('LOGIN_NEEDED');
       return;
@@ -692,7 +700,7 @@ router.get('/users/addr/:addr', jwtAuth('read'), async (req, res, next) => {
       const payload = query.docs[0].data();
       if (!payload.avatar) payload.avatar = toDataUrl(payload.wallet);
       payload.user = query.docs[0].id;
-      res.json(Validate.filterUserData(payload));
+      res.json(filterUserData(payload));
     } else {
       res.sendStatus(404);
     }
@@ -704,7 +712,7 @@ router.get('/users/addr/:addr', jwtAuth('read'), async (req, res, next) => {
 router.get('/users/addr/:addr/min', async (req, res, next) => {
   try {
     const { addr } = req.params;
-    if (!Validate.checkAddressValid(addr)) throw new ValidationError('Invalid address');
+    if (!checkAddressValid(addr)) throw new ValidationError('Invalid address');
     const query = await dbRef.where('wallet', '==', addr).get();
     if (query.docs.length > 0) {
       res.sendStatus(200);
