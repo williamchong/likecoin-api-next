@@ -1,0 +1,25 @@
+{
+  "name": "likecoin-api-users",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "backpack dev",
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "author": "William Chong",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@likecoin/ethereum-blockies": "^0.1.2",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.4",
+    "firebase-admin": "^6.1.0",
+    "xml": "^1.0.1"
+  }
+}
