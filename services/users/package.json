@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "backpack dev",
+    "build": "backpack build",
     "lint": "eslint .",
     "test": "npm run lint"
   },
@@ -25,6 +26,7 @@
     "disposable-email-domains": "^1.0.40",
     "eth-sig-util": "^2.1.0",
     "express": "^4.16.4",
+    "express-jwt": "^5.3.1",
     "express-rate-limit": "^3.3.0",
     "firebase-admin": "^6.1.0",
     "image-type": "^3.0.0",
@@ -32,8 +34,12 @@
     "jsonwebtoken": "^8.3.0",
     "multer": "^1.4.1",
     "sharp": "^0.21.0",
+    "source-map-support": "^0.5.9",
     "uuid": "^3.3.2",
     "web3-utils": "^1.0.0-beta.36",
     "xml": "^1.0.1"
+  },
+  "devDependencies": {
+    "backpack-core": "^0.8.2"
   }
 }

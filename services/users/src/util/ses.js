@@ -3,7 +3,7 @@ import EmailTemplate from '@likecoin/likecoin-email-templates';
 
 const aws = require('aws-sdk');
 
-aws.config.loadFromPath('server/config/aws.json');
+aws.config.loadFromPath('config/aws.json');
 
 const ses = new aws.SES();
 
