@@ -1,0 +1,27 @@
+{
+  "name": "likecoin-api-social",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "backpack dev",
+    "build": "backpack build",
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "author": "William Chong",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "source-map-support": "^0.5.9"
+  },
+  "devDependencies": {
+    "backpack-core": "^0.8.2"
+  }
+}
