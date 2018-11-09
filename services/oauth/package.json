@@ -1,0 +1,27 @@
+{
+  "name": "likecoin-api-oauth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "backpack dev",
+    "build": "backpack build",
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "author": "William Chong",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.4",
+    "oauth-1.0a": "^2.2.5",
+    "source-map-support": "^0.5.9"
+  },
+  "devDependencies": {
+    "backpack-core": "^0.8.2"
+  }
+}
