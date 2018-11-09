@@ -6,7 +6,7 @@ import {
   PUBSUB_TOPIC_MISC,
 } from '../../shared/constant';
 
-// import { fetchFacebookUser } from '../oauth/facebook';
+import { fetchFacebookUser } from '../util/api';
 
 import {
   handleEmailBlackList,
@@ -126,23 +126,23 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
         break;
       }
 
-      // case 'facebook': {
-      //   const { accessToken } = req.body;
-      //   const { userId, email } = await fetchFacebookUser(accessToken);
-      //   payload = req.body;
-      //   if (userId !== payload.platformUserId) {
-      //     throw new ValidationError('USER_ID_NOT_MTACH');
-      //   }
-      //   platformUserId = userId;
+      case 'facebook': {
+        const { accessToken } = req.body;
+        const { userId, email } = await fetchFacebookUser(accessToken);
+        payload = req.body;
+        if (userId !== payload.platformUserId) {
+          throw new ValidationError('USER_ID_NOT_MTACH');
+        }
+        platformUserId = userId;
 
-      //   // Set verified to the email if it matches Facebook verified email
-      //   isEmailVerified = email === payload.email;
+        // Set verified to the email if it matches Facebook verified email
+        isEmailVerified = email === payload.email;
 
-      //   // Verify Firebase user ID
-      //   const { firebaseIdToken } = req.body;
-      //   ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
-      //   break;
-      // }
+        // Verify Firebase user ID
+        const { firebaseIdToken } = req.body;
+        ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
+        break;
+      }
 
       default:
         throw new ValidationError('INVALID_PLATFORM');
@@ -467,28 +467,28 @@ router.post('/users/login', async (req, res, next) => {
         break;
       }
 
-      // case 'facebook': {
-      //   try {
-      //     const { accessToken, platformUserId } = req.body;
-      //     const { userId } = await fetchFacebookUser(accessToken);
-      //     if (userId !== platformUserId) {
-      //       throw new ValidationError('USER_ID_NOT_MTACH');
-      //     }
-      //     const query = (
-      //       await authDbRef
-      //         .where(`${platform}.userId`, '==', platformUserId)
-      //         .limit(1)
-      //         .get()
-      //     );
-      //     if (query.docs.length > 0) {
-      //       user = query.docs[0].id;
-      //     }
-      //   } catch (err) {
-      //     console.log(err);
-      //     // do nothing
-      //   }
-      //   break;
-      // }
+      case 'facebook': {
+        try {
+          const { accessToken, platformUserId } = req.body;
+          const { userId } = await fetchFacebookUser(accessToken);
+          if (userId !== platformUserId) {
+            throw new ValidationError('USER_ID_NOT_MTACH');
+          }
+          const query = (
+            await authDbRef
+              .where(`${platform}.userId`, '==', platformUserId)
+              .limit(1)
+              .get()
+          );
+          if (query.docs.length > 0) {
+            user = query.docs[0].id;
+          }
+        } catch (err) {
+          console.log(err);
+          // do nothing
+        }
+        break;
+      }
 
       default:
         throw new ValidationError('INVALID_PLATFORM');
