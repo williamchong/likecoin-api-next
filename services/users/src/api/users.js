@@ -128,7 +128,7 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
 
       case 'facebook': {
         const { accessToken } = req.body;
-        const { userId, email } = await fetchFacebookUser(accessToken);
+        const { userId, email } = await fetchFacebookUser(accessToken, req);
         payload = req.body;
         if (userId !== payload.platformUserId) {
           throw new ValidationError('USER_ID_NOT_MTACH');
