@@ -2,10 +2,9 @@ import { TEST_MODE, EXTERNAL_HOSTNAME } from '../constant';
 
 const crypto = require('crypto');
 const fs = require('fs');
-const jwt = require('jsonwebtoken');
-const expressjwt = require('express-jwt');
-const uuidv4 = require('uuid/v4');
-const config = require('../config/config.js'); // eslint-disable-line import/no-extraneous-dependencies
+const jwt = require('jsonwebtoken'); // eslint-disable-line import/no-extraneous-dependencies
+const expressjwt = require('express-jwt'); // eslint-disable-line import/no-extraneous-dependencies
+const config = require('../config/config.js'); // eslint-disable-line import/no-unresolved
 
 const audience = EXTERNAL_HOSTNAME;
 const issuer = EXTERNAL_HOSTNAME;

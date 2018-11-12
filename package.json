@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "backpack dev",
     "test": "lerna exec yarn test",
-    "lint": "lerna exec yarn lint",
+    "lint": "eslint shared && lerna exec yarn lint",
     "build": "lerna exec yarn build"
   },
   "keywords": [

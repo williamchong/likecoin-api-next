@@ -1,4 +1,4 @@
-import ValidationError from '../ValidationError';
+import { ValidationError } from '../ValidationError';
 
 export default function errorHandler(err, req, res, next) {
   const msg = (err.response && err.response.data) || err.message || err;
