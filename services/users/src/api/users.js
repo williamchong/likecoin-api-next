@@ -17,6 +17,7 @@ import {
   setSessionCookie,
   setAuthCookies,
   clearAuthCookies,
+  checkPlaformPayload,
 } from '../util/users';
 // import { tryToLinkSocialPlatform } from '../util/api/social';
 
@@ -81,72 +82,12 @@ function getBool(value = false) {
 
 router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, res, next) => {
   try {
-    let payload;
-    let firebaseUserId;
-    let platformUserId;
-    let isEmailVerified = false;
-
-    const { platform } = req.body;
-
-    switch (platform) {
-      case 'wallet': {
-        const {
-          from,
-          payload: stringPayload,
-          sign,
-        } = req.body;
-        const isLogin = false;
-        payload = checkSignPayload(from, stringPayload, sign, isLogin);
-        break;
-      }
-
-      case 'email':
-      case 'google':
-      case 'twitter': {
-        const { firebaseIdToken } = req.body;
-        ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
-        payload = req.body;
-
-        // Set verified to the email if it matches Firebase verified email
-        const firebaseUser = await admin.auth().getUser(firebaseUserId);
-        isEmailVerified = firebaseUser.email === payload.email && firebaseUser.emailVerified;
-
-        switch (platform) {
-          case 'google':
-          case 'twitter': {
-            const userInfo = getFirebaseUserProviderUserInfo(firebaseUser, platform);
-            if (userInfo) {
-              platformUserId = userInfo.uid;
-            }
-            break;
-          }
-          default:
-        }
-
-        break;
-      }
-
-      case 'facebook': {
-        const { accessToken } = req.body;
-        const { userId, email } = await fetchFacebookUser(accessToken, req);
-        payload = req.body;
-        if (userId !== payload.platformUserId) {
-          throw new ValidationError('USER_ID_NOT_MTACH');
-        }
-        platformUserId = userId;
-
-        // Set verified to the email if it matches Facebook verified email
-        isEmailVerified = email === payload.email;
-
-        // Verify Firebase user ID
-        const { firebaseIdToken } = req.body;
-        ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
-        break;
-      }
-
-      default:
-        throw new ValidationError('INVALID_PLATFORM');
-    }
+    const {
+      payload,
+      firebaseUserId,
+      platformUserId,
+      isEmailVerified = false,
+    } = await checkPlaformPayload(req);
 
     const {
       user,
@@ -508,77 +449,6 @@ router.post('/users/login', async (req, res, next) => {
 router.post('/users/logout', (req, res) => {
   clearAuthCookies(req, res);
   res.sendStatus(200);
-});
-
-router.post('/users/login/add', jwtAuth('write'), async (req, res, next) => {
-  try {
-    const { user, platform } = req.body;
-    if (req.user.user !== user) {
-      res.status(401).send('LOGIN_NEEDED');
-      return;
-    }
-    if (!platform) throw new ValidationError('INVALID_PLATFORM');
-
-    if (platform === 'wallet') {
-      const {
-        from,
-        payload: stringPayload,
-        sign,
-      } = req.body;
-      const wallet = from;
-      const isLogin = false;
-      const payload = checkSignPayload(wallet, stringPayload, sign, isLogin);
-      if (payload !== user) throw new ValidationError('WALLET_NOT_MATCH');
-      const query = await dbRef.where('wallet', '==', wallet).get();
-      if (query.docs.length > 0) throw new ValidationError('WALLET_ALREADY_USED');
-      await dbRef.doc(user).update({ wallet });
-    } else {
-      const { accessToken, secret, firebaseIdToken } = req.body;
-      const { uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken);
-      const query = await dbRef.where('firebaseUserId', '==', firebaseUserId).get();
-      if (query.docs.length > 0) {
-        query.forEach((doc) => {
-          const docUser = doc.id;
-          if (user !== docUser) {
-            throw new ValidationError('FIREBASE_USER_DUPLICATED');
-          }
-        });
-      } else {
-        await dbRef.doc(user).update({ firebaseUserId });
-      }
-
-      // const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
-
-      // if (socialPayload) {
-      //   const userDoc = await dbRef.doc(user).get();
-      //   const {
-      //     email,
-      //     displayName,
-      //     wallet,
-      //     referrer,
-      //     locale,
-      //     timestamp,
-      //   } = userDoc.data();
-      //   publisher.publish(PUBSUB_TOPIC_MISC, req, {
-      //     logType: 'eventSocialLink',
-      //     platform,
-      //     user,
-      //     email,
-      //     displayName,
-      //     wallet,
-      //     referrer,
-      //     locale,
-      //     registerTime: timestamp,
-      //     ...socialPayload,
-      //   });
-      // }
-
-      /* TODO: update firebase auth linked platform info in a subcollection? */
-    }
-    res.sendStatus(200);
-  } catch (err) {
-    next(err);
-  }
 });
 
 router.get('/users/self', jwtAuth('read'), async (req, res, next) => {

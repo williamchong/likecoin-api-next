@@ -8,11 +8,14 @@ import { ValidationError } from '../../shared/ValidationError';
 import { getEmailBlacklist, getEmailNoDot } from './poller';
 import { jwtSign } from './jwt';
 import { personalEcRecover, hexToUtf8 } from './web3';
+import { fetchFacebookUser, fetchTwitterUser } from './api';
 import {
   userCollection as dbRef,
   userAuthCollection as authDbRef,
   FieldValue,
+  admin,
 } from '../../shared/util/firebase';
+import { getFirebaseUserProviderUserInfo } from '../../shared/FirebaseApp';
 
 const disposableDomains = require('disposable-email-domains');
 
@@ -231,6 +234,81 @@ export async function checkReferrerExists(referrer) {
     throw new ValidationError('REFERRER_LIMIT_EXCCEDDED');
   }
   return referrerRef.exists;
+}
+
+export async function checkPlaformPayload(req) {
+  let payload;
+  let firebaseUserId;
+  let platformUserId;
+  let isEmailVerified = false;
+
+  const { platform } = req.body;
+
+  switch (platform) {
+    case 'wallet': {
+      const {
+        from,
+        payload: stringPayload,
+        sign,
+      } = req.body;
+      const isLogin = false;
+      payload = checkSignPayload(from, stringPayload, sign, isLogin);
+      break;
+    }
+
+    case 'email':
+    case 'google':
+    case 'twitter': {
+      const { firebaseIdToken } = req.body;
+      ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
+      payload = req.body;
+
+      // Set verified to the email if it matches Firebase verified email
+      const firebaseUser = await admin.auth().getUser(firebaseUserId);
+      isEmailVerified = firebaseUser.email === payload.email && firebaseUser.emailVerified;
+
+      switch (platform) {
+        case 'google':
+        case 'twitter': {
+          const userInfo = getFirebaseUserProviderUserInfo(firebaseUser, platform);
+          if (userInfo) {
+            platformUserId = userInfo.uid;
+          }
+          break;
+        }
+        default:
+      }
+
+      break;
+    }
+
+    case 'facebook': {
+      const { accessToken } = req.body;
+      const { userId, email } = await fetchFacebookUser(accessToken, req);
+      payload = req.body;
+      if (userId !== payload.platformUserId) {
+        throw new ValidationError('USER_ID_NOT_MTACH');
+      }
+      platformUserId = userId;
+
+      // Set verified to the email if it matches Facebook verified email
+      isEmailVerified = email === payload.email;
+
+      // Verify Firebase user ID
+      const { firebaseIdToken } = req.body;
+      ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
+      break;
+    }
+
+    default:
+      throw new ValidationError('INVALID_PLATFORM');
+  }
+  return {
+    payload,
+    firebaseUserId,
+    platformUserId,
+    isEmailVerified,
+  };
 }
 
 export async function tryToLinkOAuthLogin({
