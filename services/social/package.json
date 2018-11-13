@@ -16,10 +16,13 @@
   "author": "William Chong",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
-    "source-map-support": "^0.5.9"
+    "source-map-support": "^0.5.9",
+    "url-parse": "^1.4.4"
   },
   "devDependencies": {
     "backpack-core": "^0.8.2"

@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { jwtAuth } from '../../util/jwt';
-import { ValidationError } from '../../../util/ValidationHelper';
+import { jwtAuth } from '../../../shared/util/jwt';
+import { ValidationError } from '../../../shared/ValidationError';
 
-import { LINK_ICON_TYPES } from '../../../constant/index';
-import { isValidSocialLink } from '../../../util/social';
+import { LINK_ICON_TYPES } from '../../../shared/constant/index';
+import { isValidSocialLink } from '../../../shared/util/social';
 
-const { userCollection: dbRef } = require('../../util/firebase');
+import { userCollection as dbRef } from '../../../shared/util/firebase';
 
 const router = Router();
 

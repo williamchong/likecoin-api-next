@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import { fetchTwitterOAuthInfo } from '../../oauth/twitter';
-import { PUBSUB_TOPIC_MISC } from '../../../constant';
-import publisher from '../../util/gcloudPub';
-import { jwtAuth } from '../../util/jwt';
-import { checkPlatformAlreadyLinked, socialLinkTwitter } from '../../util/api/social';
-import { ValidationError } from '../../../util/ValidationHelper';
-import { tryToLinkOAuthLogin } from '../../util/api/users';
+import { PUBSUB_TOPIC_MISC } from '../../../shared/constant';
+import publisher from '../../../shared/util/gcloudPub';
+import { jwtAuth } from '../../../shared/util/jwt';
+import { checkPlatformAlreadyLinked, socialLinkTwitter } from '../../util/social';
+import { fetchTwitterOAuthInfo, tryToLinkOAuthLogin } from '../../util/api';
+import { ValidationError } from '../../../shared/ValidationError';
 
-const {
-  userCollection: dbRef,
-} = require('../../util/firebase');
+import {
+  userCollection as dbRef,
+} from '../../../shared/util/firebase';
 
 const router = Router();
 
@@ -72,11 +71,11 @@ router.post('/social/link/twitter', jwtAuth('write'), async (req, res, next) => 
       false,
     );
 
-    await tryToLinkOAuthLogin({
-      likeCoinId: user,
-      platform,
-      platformUserId: userId,
-    });
+    // await tryToLinkOAuthLogin({
+    //   likeCoinId: user,
+    //   platform,
+    //   platformUserId: userId,
+    // });
 
     res.json({
       platform,

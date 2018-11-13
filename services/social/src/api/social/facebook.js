@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { PUBSUB_TOPIC_MISC } from '../../../constant';
-import publisher from '../../util/gcloudPub';
-import { jwtAuth } from '../../util/jwt';
-import { checkPlatformAlreadyLinked, socialLinkFacebook } from '../../util/api/social';
-import { ValidationError } from '../../../util/ValidationHelper';
-import { tryToLinkOAuthLogin } from '../../util/api/users';
+import { PUBSUB_TOPIC_MISC } from '../../../shared/constant';
+import publisher from '../../../shared/util/gcloudPub';
+import { jwtAuth } from '../../../shared/util/jwt';
+import { checkPlatformAlreadyLinked, socialLinkFacebook } from '../../util/social';
+import { ValidationError } from '../../../shared/ValidationError';
+import { tryToLinkOAuthLogin } from '../../util/api';
 
-const { userCollection: dbRef } = require('../../util/firebase');
+import { userCollection as dbRef } from '../../../shared/util/firebase';
+
 
 const router = Router();
 
@@ -53,11 +54,11 @@ router.post('/social/link/facebook', jwtAuth('write'), async (req, res, next) =>
       pages,
     } = await socialLinkFacebook(user, accessToken);
 
-    await tryToLinkOAuthLogin({
-      likeCoinId: user,
-      platform,
-      platformUserId: userId,
-    });
+    // await tryToLinkOAuthLogin({
+    //   likeCoinId: user,
+    //   platform,
+    //   platformUserId: userId,
+    // });
 
     res.json({
       platform,

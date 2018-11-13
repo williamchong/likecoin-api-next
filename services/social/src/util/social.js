@@ -1,10 +1,13 @@
-import { fetchFacebookUser } from '../../oauth/facebook';
-import { fetchTwitterUser, fetchTwitterUserByAccessToken } from '../../oauth/twitter';
+import {
+  fetchFacebookUser,
+  fetchTwitterUser,
+  fetchTwitterUserByAccessToken,
+} from './api';
 
-const {
-  userCollection: dbRef,
+import {
+  userCollection as dbRef,
   FieldValue,
-} = require('../firebase');
+} from '../../shared/util/firebase';
 
 export async function checkPlatformAlreadyLinked(user, platform) {
   const doc = await dbRef.doc(user).collection('social').doc(platform).get();

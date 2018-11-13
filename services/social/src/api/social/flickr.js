@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import { checkPlatformAlreadyLinked } from '../../util/api/social';
-import { fetchFlickrOAuthInfo, fetchFlickrUser } from '../../oauth/flickr';
-import { PUBSUB_TOPIC_MISC } from '../../../constant';
-import publisher from '../../util/gcloudPub';
-import { jwtAuth } from '../../util/jwt';
-import { ValidationError } from '../../../util/ValidationHelper';
+import { PUBSUB_TOPIC_MISC } from '../../../shared/constant';
+import publisher from '../../../shared/util/gcloudPub';
+import { jwtAuth } from '../../../shared/util/jwt';
+import { checkPlatformAlreadyLinked } from '../../util/social';
+import { fetchFlickrOAuthInfo, fetchFlickrUser } from '../../util/api';
+import { ValidationError } from '../../../shared/ValidationError';
 
-const {
-  userCollection: dbRef,
+import {
+  userCollection as dbRef,
   FieldValue,
-} = require('../../util/firebase');
+} from '../../../shared/util/firebase';
 
 const router = Router();
 

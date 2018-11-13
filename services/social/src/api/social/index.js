@@ -3,20 +3,25 @@ import { Router } from 'express';
 import {
   PUBSUB_TOPIC_MISC,
   DISPLAY_SOCIAL_MEDIA_OPTIONS,
-} from '../../../constant';
-import publisher from '../../util/gcloudPub';
-import { jwtAuth } from '../../util/jwt';
-import { ValidationHelper as Validate, ValidationError } from '../../../util/ValidationHelper';
+} from '../../../shared/constant';
+import publisher from '../../../shared/util/gcloudPub';
+import { jwtAuth } from '../../../shared/util/jwt';
+import { ValidationError } from '../../../shared/ValidationError';
+import {
+  filterSocialPlatformPersonal,
+  filterSocialLinksPersonal,
+  filterSocialPlatformPublic,
+  filterSocialLinksMeta,
+} from '../../../shared/ValidationHelper';
 
 import facebook from './facebook';
 import flickr from './flickr';
 import medium from './medium';
 import twitter from './twitter';
-import instagram from './instagram';
 import link from './link';
-import { tryToUnlinkOAuthLogin } from '../../util/api/users';
+import { tryToUnlinkOAuthLogin } from '../../util/api';
 
-const { userCollection: dbRef } = require('../../util/firebase');
+import { userCollection as dbRef } from '../../../shared/util/firebase';
 
 const router = Router();
 
@@ -24,7 +29,6 @@ router.use(facebook);
 router.use(flickr);
 router.use(medium);
 router.use(twitter);
-router.use(instagram);
 router.use(link);
 
 function getLinkOrderMap(socialCol) {
@@ -60,7 +64,7 @@ router.get('/social/list/:id', async (req, res, next) => {
 
       const { isLinked, isPublic, isExternalLink } = d.data();
       if ((isLinked || isExternalLink) && isPublic !== false) {
-        replyObj[d.id] = Validate.filterSocialPlatformPublic({ ...d.data() });
+        replyObj[d.id] = filterSocialPlatformPublic({ ...d.data() });
         if (isExternalLink) replyObj[d.id].order = linkOrderMap[d.id];
       }
     });
@@ -101,13 +105,13 @@ router.get('/social/list/:id/details', jwtAuth('read'), async (req, res, next) =
     col.docs.forEach((d) => {
       const { isLinked, isExternalLink } = d.data();
       if (isLinked) {
-        replyObj.platforms[d.id] = Validate.filterSocialPlatformPersonal({ ...d.data() });
+        replyObj.platforms[d.id] = filterSocialPlatformPersonal({ ...d.data() });
       } else if (isExternalLink) {
-        replyObj.links[d.id] = Validate.filterSocialLinksPersonal({ ...d.data() });
+        replyObj.links[d.id] = filterSocialLinksPersonal({ ...d.data() });
         replyObj.links[d.id].order = linkOrderMap[d.id];
       }
       if (d.id === 'meta') {
-        replyObj.meta = Validate.filterSocialLinksMeta({ ...d.data() });
+        replyObj.meta = filterSocialLinksMeta({ ...d.data() });
       }
     });
 

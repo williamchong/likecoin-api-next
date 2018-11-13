@@ -28,3 +28,5 @@ export const ISTIO_TRACING_HEADERS = [
   'x-b3-flags',
   'x-ot-span-context',
 ];
+
+export const LINK_ICON_TYPES = ['profile', 'blog', 'photo', 'mail', 'contact', 'link'];
