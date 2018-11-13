@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import api from './api/users';
+import internalApi from './api/internal/users';
 import errorHandler from '../shared/middleware/errorHandler';
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use('/internal', internalApi);
 app.use(api);
 
 app.get('/', (req, res) => {

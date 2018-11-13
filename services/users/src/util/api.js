@@ -14,5 +14,13 @@ function getIstioHeaders(req) {
 
 export const fetchFacebookUser = (token, req) => {
   const headers = getIstioHeaders(req);
-  return axios.get(`${OAUTH_API_HOST}/oauth/facebook/user?token=${token}`, { headers });
+  return axios.get(`${OAUTH_API_HOST}/internal/oauth/facebook/user?token=${token}`, { headers });
+};
+
+export const fetchTwitterUser = (token, secret, req) => {
+  const headers = getIstioHeaders(req);
+  return axios.get(
+    `${OAUTH_API_HOST}/internal/oauth/twitter/user/accesstoken?token=${token}&secret=${secret}`,
+    { headers },
+  );
 };

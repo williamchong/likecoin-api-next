@@ -18,6 +18,7 @@ import {
   setAuthCookies,
   clearAuthCookies,
   checkPlaformPayload,
+  tryToLinkOAuthLogin,
 } from '../util/users';
 // import { tryToLinkSocialPlatform } from '../util/api/social';
 
@@ -82,6 +83,7 @@ function getBool(value = false) {
 
 router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, res, next) => {
   try {
+    const { platform } = req.body;
     const {
       payload,
       firebaseUserId,
@@ -201,17 +203,10 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
       await dbRef.doc(referrer).collection('referrals').doc(user).create(timestampObj);
     }
 
-    // platformUserId is only set when the platform is valid
-    if (platformUserId) {
-      const doc = {
-        [platform]: {
-          userId: platformUserId,
-        },
-      };
-      await authDbRef.doc(user).create(doc);
-    }
+    if (platformUserId) await tryToLinkOAuthLogin(user, platform, platformUserId);
 
-    // const socialPayload = await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
+    /* TODO: use better checking than accessToken, which might not be filled for furture platform */
+    // if (accessToken) await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
 
     await setAuthCookies(req, res, { user, wallet });
     res.sendStatus(200);

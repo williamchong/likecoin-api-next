@@ -241,9 +241,7 @@ export async function checkPlaformPayload(req) {
   let firebaseUserId;
   let platformUserId;
   let isEmailVerified = false;
-
   const { platform } = req.body;
-
   switch (platform) {
     case 'wallet': {
       const {
@@ -256,9 +254,19 @@ export async function checkPlaformPayload(req) {
       break;
     }
 
-    case 'email':
-    case 'google':
     case 'twitter': {
+      const { accessToken, secret } = req.body;
+      if (accessToken && secret) {
+        const { userId } = await fetchTwitterUser(accessToken, secret, req);
+        platformUserId = userId;
+        payload = req.body;
+        break;
+      }
+      // if no twitter accessToken, try firebaseIdToken below
+    }
+    // eslint-disable-line no-fallthrough
+    case 'email':
+    case 'google': {
       const { firebaseIdToken } = req.body;
       ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
       payload = req.body;
@@ -283,10 +291,10 @@ export async function checkPlaformPayload(req) {
     }
 
     case 'facebook': {
-      const { accessToken } = req.body;
+      const { accessToken, firebaseIdToken } = req.body;
       const { userId, email } = await fetchFacebookUser(accessToken, req);
       payload = req.body;
-      if (userId !== payload.platformUserId) {
+      if (payload.platformUserId && userId !== payload.platformUserId) {
         throw new ValidationError('USER_ID_NOT_MTACH');
       }
       platformUserId = userId;
@@ -295,7 +303,6 @@ export async function checkPlaformPayload(req) {
       isEmailVerified = email === payload.email;
 
       // Verify Firebase user ID
-      const { firebaseIdToken } = req.body;
       ({ uid: firebaseUserId } = await admin.auth().verifyIdToken(firebaseIdToken));
       break;
     }
