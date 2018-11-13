@@ -50,6 +50,7 @@ export async function setAuthCookies(req, res, { user, wallet }) {
     lastAccessedTs: Date.now(),
     ts: Date.now(),
   });
+  return token;
 }
 
 export async function clearAuthCookies(req, res) {

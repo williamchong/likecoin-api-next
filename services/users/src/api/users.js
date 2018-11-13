@@ -6,7 +6,7 @@ import {
   PUBSUB_TOPIC_MISC,
 } from '../../shared/constant';
 
-import { fetchFacebookUser } from '../util/api';
+import { fetchFacebookUser, tryToLinkSocialPlatform } from '../util/api';
 
 import {
   handleEmailBlackList,
@@ -20,7 +20,6 @@ import {
   checkPlaformPayload,
   tryToLinkOAuthLogin,
 } from '../util/users';
-// import { tryToLinkSocialPlatform } from '../util/api/social';
 
 import {
   checkUserNameValid,
@@ -205,10 +204,13 @@ router.post('/users/new', apiLimiter, multer.single('avatarFile'), async (req, r
 
     if (platformUserId) await tryToLinkOAuthLogin(user, platform, platformUserId);
 
-    /* TODO: use better checking than accessToken, which might not be filled for furture platform */
-    // if (accessToken) await tryToLinkSocialPlatform(user, platform, { accessToken, secret });
+    const token = await setAuthCookies(req, res, { user, wallet });
 
-    await setAuthCookies(req, res, { user, wallet });
+    /* TODO: use better checking than accessToken, which might not be filled for furture platform */
+    if (accessToken) {
+      await tryToLinkSocialPlatform(user, platform, { accessToken, secret }, req, token);
+    }
+
     res.sendStatus(200);
 
     publisher.publish(PUBSUB_TOPIC_MISC, req, {
