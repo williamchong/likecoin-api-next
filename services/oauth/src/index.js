@@ -1,6 +1,6 @@
 import express from 'express';
 
-import api from './api/oauth';
+import internalApi from './api/internal/oauth';
 import errorHandler from '../shared/middleware/errorHandler';
 
 const app = express();
@@ -11,7 +11,7 @@ app.set('port', port);
 
 if (process.env.NODE_ENV === 'production') app.disable('x-powered-by');
 
-app.use(api);
+app.use('/internal', internalApi);
 
 app.get('/', (req, res) => {
   res.sendStatus(200);

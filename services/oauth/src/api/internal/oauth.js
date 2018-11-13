@@ -1,14 +1,14 @@
 import { Router } from 'express';
 
-import { fetchFacebookUser } from '../util/oauth/facebook';
-import { fetchFlickrOAuthInfo, fetchFlickrUser } from '../util/oauth/flickr';
-import { fetchMediumOAuthInfo, fetchMediumUser } from '../util/oauth/medium';
+import { fetchFacebookUser } from '../../util/oauth/facebook';
+import { fetchFlickrOAuthInfo, fetchFlickrUser } from '../../util/oauth/flickr';
+import { fetchMediumOAuthInfo, fetchMediumUser } from '../../util/oauth/medium';
 import {
   fetchTwitterOAuthInfo,
   fetchTwitterUser,
   fetchTwitterUserByAccessToken,
-} from '../util/oauth/twitter';
-import { ValidationError } from '../../shared/ValidationError';
+} from '../../util/oauth/twitter';
+import { ValidationError } from '../../../shared/ValidationError';
 
 const router = Router();
 
