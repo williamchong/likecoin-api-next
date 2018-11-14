@@ -1,13 +1,18 @@
 import { Router } from 'express';
 
 import { jwtAuth } from '../../../shared/util/jwt';
-import { tryToLinkSocialPlatform } from '../../../util/social';
+import { tryToLinkSocialPlatform } from '../../util/social';
 
 const router = Router();
 
 router.post('/internal/social/add', jwtAuth('write'), async (req, res, next) => {
   try {
-    const { user, platform, accessToken, secret } = req.body;
+    const {
+      user,
+      platform,
+      accessToken,
+      secret,
+    } = req.body;
     if (req.user.user !== user) {
       res.status(401).send('LOGIN_NEEDED');
       return;

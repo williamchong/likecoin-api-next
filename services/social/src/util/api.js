@@ -6,7 +6,12 @@ import { getIstioHeaders } from '../../shared/util/istioHeaders';
 export const tryToLinkOAuthLogin = (
   user,
   platform,
-  { accessToken, firebaseIdToken, token },
+  {
+    accessToken,
+    firebaseIdToken,
+    token,
+    secret,
+  },
   req,
 ) => {
   const headers = { ...getIstioHeaders(req), cookie: req.headers.cookie };
@@ -16,6 +21,7 @@ export const tryToLinkOAuthLogin = (
     accessToken,
     firebaseIdToken,
     token,
+    secret,
   }, { headers });
 };
 

@@ -54,11 +54,12 @@ router.post('/social/link/facebook', jwtAuth('write'), async (req, res, next) =>
       pages,
     } = await socialLinkFacebook(user, accessToken);
 
-    // await tryToLinkOAuthLogin({
-    //   likeCoinId: user,
-    //   platform,
-    //   platformUserId: userId,
-    // });
+    await tryToLinkOAuthLogin(
+      user,
+      platform,
+      { accessToken },
+      req,
+    );
 
     res.json({
       platform,

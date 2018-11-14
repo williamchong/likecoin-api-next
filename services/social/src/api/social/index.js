@@ -132,10 +132,11 @@ router.post('/social/unlink/:platform', jwtAuth('write'), async (req, res, next)
       return;
     }
 
-    await tryToUnlinkOAuthLogin({
-      likeCoinId: user,
+    await tryToUnlinkOAuthLogin(
+      user,
       platform,
-    });
+      req,
+    );
 
     const socialDoc = await dbRef.doc(user).collection('social').doc(platform).get();
     if (!socialDoc.exists) throw new ValidationError('platform unknown');

@@ -71,11 +71,12 @@ router.post('/social/link/twitter', jwtAuth('write'), async (req, res, next) => 
       false,
     );
 
-    // await tryToLinkOAuthLogin({
-    //   likeCoinId: user,
-    //   platform,
-    //   platformUserId: userId,
-    // });
+    await tryToLinkOAuthLogin(
+      user,
+      platform,
+      { token: newOAuthToken, secret: newOAuthTokenSecret },
+      req,
+    );
 
     res.json({
       platform,
