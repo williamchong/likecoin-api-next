@@ -9,7 +9,7 @@ export const tryToLinkOAuthLogin = (
   { accessToken, firebaseIdToken, token },
   req,
 ) => {
-  const headers = { ...getIstioHeaders(req), cookies: req.headers.cookies };
+  const headers = { ...getIstioHeaders(req), cookie: req.headers.cookie };
   return axios.post(`${USER_API_HOST}/internal/users/oauth/add`, {
     user,
     platform,
@@ -20,7 +20,7 @@ export const tryToLinkOAuthLogin = (
 };
 
 export const tryToUnlinkOAuthLogin = (user, platform, req) => {
-  const headers = { ...getIstioHeaders(req), cookies: req.headers.cookies };
+  const headers = { ...getIstioHeaders(req), cookie: req.headers.cookie };
   return axios.post(
     `${USER_API_HOST}/internal/users/oauth/remove`,
     { user, platform },

@@ -1,4 +1,4 @@
-import parse from 'url-parse'; // eslint-disable-line import/no-unresolved
+import parse from 'url-parse'; // eslint-disable-line import/no-unresolved, import/no-extraneous-dependencies
 
 import { EMAIL_REGEX } from '../constant';
 
